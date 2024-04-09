@@ -5,6 +5,7 @@ import NextImage from '../../components/NextImage/NextImage';
 import { EXPECTED_CHAIN } from '../../constants';
 import { useSWAdopterContract } from '../../hooks/contracts';
 import { useCollectionMetadata } from '../../hooks/useCollectionMetadata';
+import { SpinnerIcon } from '../../components/icons/SpinnerIcon'
 import NotConnected from './NotConnected';
 import StartMintStep from './steps/StartMintStep';
 import SwitchNetwork from './SwitchNetwork';
@@ -36,6 +37,7 @@ export default function MintContractDemo() {
     contract.abi,
   );
   console.log('collectionName', collectionName, isLoadingCollectionMetadata);
+
   const mintContent = useMemo(() => {
     return (
       <StartMintStep
@@ -46,7 +48,7 @@ export default function MintContractDemo() {
     );
   }, [mintStep, collectionName]);
 
-  /*
+
   if (contract.status === 'notConnected') {
     return <NotConnected />;
   }
@@ -54,9 +56,8 @@ export default function MintContractDemo() {
   if (contract.status === 'onUnsupportedNetwork') {
     return <SwitchNetwork />;
   }
-*/
-  /*
-  if (isLoadingCollectionMetadata || contract.status !== 'ready') {
+
+  if (/*isLoadingCollectionMetadata ||*/ contract.status !== 'ready') {
     return (
       <div className="my-5 flex justify-center align-middle">
         <span className="text-xl">
@@ -65,26 +66,25 @@ export default function MintContractDemo() {
       </div>
     );
   }
-*/
 
   collectionName = 'Smart Wallet Early Adopter';
   imageAddress = '/smart_wallet.gif';
 
   return (
-    <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-12 h-full py-8">
+    <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-12 pb-12 md:pb-0 my-24">
       <NextImage
         src={imageAddress}
         altText={collectionName}
-        className="w-[350px] md:w-[500px] rounded-2xl"
+        className="w-[85%] md:w-[550px] rounded-2xl"
       />
-      <div className="flex flex-col items-center justify-start gap-4">
+      <div className="flex flex-col items-center justify-start gap-3">
         <h1
           className="text-center font-bold lg:ml-0 lg:mr-auto lg:text-left px-4 md:px-0"
-          style={{ fontFamily: 'Helvetica Neue, sans-serif', fontSize: '32px' }}
+          style={{ fontFamily: 'Helvetica Neue, sans-serif', fontSize: '28px' }}
         >
           {collectionName}
         </h1>
-        <div className="lg:ml-0 lg:mr-auto lg:text-left" style={{ color: '#8A919E' }}>
+        <div className="lg:ml-0 lg:mr-auto lg:text-left text-lg" style={{ color: '#8A919E' }}>
           {' '}
           0.00 ETH{' '}
         </div>

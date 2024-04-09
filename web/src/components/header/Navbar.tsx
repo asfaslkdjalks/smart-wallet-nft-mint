@@ -25,20 +25,18 @@ export function NavbarLink({
 
 export function NavbarTitle() {
   return (
-    <div className="flex h-8 items-center justify-start gap-4">
-      <div className="mt-4 flex">
-        <NextLink href="/" passHref className="relative m-auto mr-1 h-8 w-8">
+    <div className="flex h-8 items-center justify-start gap-3">
+        <NextLink href="/" passHref>
           <HeaderIcon />
         </NextLink>
-        <span>YOUR APP HERE</span>
-      </div>
+        <span className='text-sm text-gray-500 font-semibold'>YOUR APP HERE</span>
     </div>
   );
 }
 
 function Navbar() {
   return (
-    <nav className={clsx('flex flex-1 flex-grow items-center justify-between px-8 lg:px-0')}>
+    <nav className={clsx('flex flex-1 flex-grow items-center justify-between px-6 lg:px-0')}>
       <NavbarTitle />
       <div>
         <AccountConnect />

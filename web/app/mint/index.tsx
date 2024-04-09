@@ -20,9 +20,9 @@ const MintContractDemo = dynamic(
  */
 export default function MintPage() {
   return (
-    <div className='flex flex-col h-screen justify-between'>
+    <div className='flex flex-col min-h-screen justify-between'>
       <Header />
-      <main className="container h-full">
+      <main>
         <MintContractDemo />
       </main>
       <Footer />

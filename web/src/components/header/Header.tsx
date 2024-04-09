@@ -33,7 +33,7 @@ function Header({ ghost }: HeaderProps) {
   return (
     <header
       data-scroll-state={scrollState}
-      className="flex h-[140px] flex-col justify-center md:pt-8"
+      className="flex flex-col justify-center md:pt-8"
     >
       <Menu />
     </header>

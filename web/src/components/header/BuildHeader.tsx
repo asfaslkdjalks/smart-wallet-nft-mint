@@ -4,7 +4,7 @@ import clsx from 'clsx';
 export default function BuildHeader({ className }: { className?: string }) {
   return (
     <div
-      className={clsx('h-[108px] w-full p-4 text-left md:text-center md:h-[54px]', className)}
+      className={clsx('mr-2', className)}
       style={{
         backgroundColor: '#141519',
       }}
