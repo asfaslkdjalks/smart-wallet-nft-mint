@@ -1,3 +1,4 @@
+"use client";
 import { useMemo, useState } from 'react';
 import { encodeFunctionData, formatEther } from 'viem';
 import { useAccount, useEstimateGas } from 'wagmi';
@@ -9,6 +10,14 @@ import { SpinnerIcon } from '../../components/icons/SpinnerIcon'
 import NotConnected from './NotConnected';
 import StartMintStep from './steps/StartMintStep';
 import SwitchNetwork from './SwitchNetwork';
+
+if (typeof window !== "undefined") {
+  // @ts-ignore
+    window.Browser = {
+      T: () => {
+      }
+    };
+  }
 
 export enum MintSteps {
   START_MINT_STEP,

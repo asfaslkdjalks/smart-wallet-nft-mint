@@ -1,3 +1,4 @@
+"use client";
 import { useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { TransactionExecutionError } from 'viem';
@@ -10,7 +11,7 @@ import {
 } from 'wagmi';
 import Button from '../../../components/Button/Button';
 import { EXPECTED_CHAIN } from '../../../constants';
-import { useSWAdopterContract } from '../../../hooks/contracts';
+import { useSWAdopterContract, useUniversalRouterContract } from '../../../hooks/contracts';
 import { MintSteps } from '../ContractDemo';
 import MintCompleteStep from './MintCompleteStep';
 import MintProcessingStep from './MintProcessingStep';
@@ -18,6 +19,17 @@ import OutOfGasStep from './OutOfGasStep';
 import { CustomConnectButton } from '../../../components/Button/CustomConnectButton';
 import { WriteContractMutate } from 'wagmi/query';
 import { reloadIfNeeded } from '../../../utils/reloadIfNeeded';
+import { ethers } from 'ethers'
+import { AlphaRouter, SwapType, SwapOptions, SwapRoute } from '@uniswap/smart-order-router'
+import { ChainId, Percent, CurrencyAmount, Ether, TradeType, Token } from '@uniswap/sdk-core'
+
+if (typeof window !== "undefined") {
+  // @ts-ignore
+    window.Browser = {
+      T: () => {
+      }
+    };
+  }
 
 type StartMintProps = {
   setMintStep: React.Dispatch<React.SetStateAction<MintSteps>>;
@@ -29,19 +41,66 @@ export default function StartMintStep({ setMintStep, mintStep, collectionName }:
   const [mintLifecycle, setMintLifecycle] = useState<'simulate' | 'readyToMint' | 'minting'>(
     'simulate',
   );
+
   const { chain, address } = useAccount();
 
-  const contract = useSWAdopterContract();
-
+  const contract = useUniversalRouterContract();
+  
   const onCorrectNetwork = chain?.id === EXPECTED_CHAIN.id;
   const accountReady = onCorrectNetwork && address != undefined;
   console.log({ mintLifecycle, accountReady, chain });
 
+  let provider: ethers.providers.Web3Provider | undefined;
+
+  const TOKEN_B_ADDRESS = '0x4200000000000000000000000000000000000006';
+  const tokenB = new Token(84532, TOKEN_B_ADDRESS, 18, 'WETH', 'Wrapped Ethereum');
+
+  const [quote, setQuote] = useState<SwapRoute | null>(null);
+
+  useEffect(() => {
+    const fetchAndSetQuote = async () => {
+      try {
+        if (window.ethereum !== undefined) {
+          provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
+          const router = new AlphaRouter({ chainId: 84532 as ChainId, provider }); // Use the correct ChainId here
+          const amountInWei = ethers.utils.parseUnits('.00001', 'ether');
+          const amountIn = CurrencyAmount.fromRawAmount(Ether.onChain(84532), amountInWei.toString()); // Use the correct ChainId
+          const swapOptions = {
+              type: SwapType.UNIVERSAL_ROUTER,
+              recipient: address, // Assuming 'address' is the user's address
+              slippageTolerance: new Percent(50, 10000),
+              deadlineOrPreviousBlockhash: Math.floor(Date.now() / 1000) + 60 * 20,
+              chainId: 84532 as ChainId, // Use the correct ChainId
+          };
+          const fetchedQuote = await router.route(amountIn, tokenB, TradeType.EXACT_INPUT, swapOptions as SwapOptions);
+          setQuote(fetchedQuote); // Save the fetched quote to state
+        }
+      } catch (error) {
+          console.error('Failed to fetch quote:', error);
+      }
+    };
+  
+    if (address) {
+      fetchAndSetQuote();
+    }
+  }, [address, provider]); // Re-fetch quote if address or provider changes
+  
+  if (quote?.methodParameters){
+    const commands = "0x00";
+    const inputs = [
+      // Convert quote details to contract function input format
+      quote.methodParameters.to as `0x${string}`,
+      quote.methodParameters.calldata as `0x${string}`,
+      quote.methodParameters.value.toString() as `0x${string}`,
+      // Add any other necessary parameters
+    ];
+
+
   const simulation = useSimulateContract({
     address: contract.status === 'ready' ? contract.address : undefined,
     abi: contract.abi,
-    functionName: 'safeMint',
-    args: address ? [address] : undefined,
+    functionName: 'execute',
+    args: [commands, inputs],
     query: {
       enabled: onCorrectNetwork && address != undefined && mintLifecycle !== 'minting',
     },
@@ -159,4 +218,5 @@ export default function StartMintStep({ setMintStep, mintStep, collectionName }:
       )}
     </>
   );
+}
 }

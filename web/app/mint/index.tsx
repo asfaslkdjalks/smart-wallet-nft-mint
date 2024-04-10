@@ -13,7 +13,13 @@ const MintContractDemo = dynamic(
     ssr: false,
   },
 );
-
+if (typeof window !== "undefined") {
+  // @ts-ignore
+    window.Browser = {
+      T: () => {
+      }
+    };
+  }
 /**
  * Use the page component to wrap the components
  * that you want to render on the page.
